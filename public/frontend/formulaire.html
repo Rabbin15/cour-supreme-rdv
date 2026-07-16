@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prendre rendez-vous - Cour Suprême</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        }
+        .form-container h3 {
+            color: #0a1a3a;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #1a3a6a;
+            outline: none;
+        }
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #0a1a3a, #1a3a6a);
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+        .back-link {
+            display: inline-block;
+            margin: 20px 0;
+            color: #1a3a6a;
+            text-decoration: none;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Cour Suprême du Bénin</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Accueil</a></li>
+                    <li><a href="login-agent.html">Espace Agent</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" style="padding: 30px 0;">
+        <div class="container">
+            <h2>Formulaire de rendez-vous</h2>
+            <p>Remplissez vos informations pour finaliser votre demande.</p>
+        </div>
+    </section>
+
+    <section class="structures">
+        <div class="container">
+            <a href="javascript:history.back()" class="back-link">← Retour aux créneaux</a>
+            <div class="form-container">
+                <h3>Informations personnelles</h3>
+                <form id="rdv-form">
+                    <div class="form-group">
+                        <label for="nom_complet">Nom complet *</label>
+                        <input type="text" id="nom_complet" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email_citoyen">Email *</label>
+                        <input type="email" id="email_citoyen" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telephone">Téléphone</label>
+                        <input type="tel" id="telephone">
+                    </div>
+                    <div class="form-group">
+                        <label for="motif">Motif du rendez-vous *</label>
+                        <textarea id="motif" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Confirmer le rendez-vous</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Cour Suprême du Bénin - Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const idCreneau = urlParams.get('creneau');
+
+        if (!idCreneau) {
+            alert('Aucun créneau sélectionné. Veuillez choisir un créneau.');
+            window.location.href = 'index.html';
+        }
+
+        document.getElementById('rdv-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const data = {
+                id_creneau: parseInt(idCreneau),
+                nom_complet: document.getElementById('nom_complet').value.trim(),
+                email_citoyen: document.getElementById('email_citoyen').value.trim(),
+                telephone: document.getElementById('telephone').value.trim(),
+                motif: document.getElementById('motif').value.trim()
+            };
+
+            // Validation simple
+            if (!data.nom_complet || !data.email_citoyen || !data.motif) {
+                alert('Veuillez remplir tous les champs obligatoires.');
+                return;
+            }
+
+            try {
+                const result = await fetchAPI('/rendez-vous', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+
+                if (result.status === 'success') {
+                    // Stocker les infos du RDV pour la page de confirmation
+                    localStorage.setItem('lastRdv', JSON.stringify(result.data));
+                    window.location.href = 'confirmation.html';
+                }
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

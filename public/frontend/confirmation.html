@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation - Cour Suprême</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .confirmation-box {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .confirmation-box .icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+        .confirmation-box h3 {
+            color: #0a1a3a;
+            margin-bottom: 10px;
+        }
+        .confirmation-box .details {
+            text-align: left;
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .confirmation-box .details p {
+            margin: 8px 0;
+        }
+        .confirmation-box .details strong {
+            color: #0a1a3a;
+        }
+        .btn-accueil {
+            display: inline-block;
+            background: #f5c842;
+            color: #0a1a3a;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .btn-accueil:hover {
+            background: #e0b030;
+        }
+        .annulation-link {
+            display: block;
+            margin-top: 15px;
+            color: #dc3545;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Cour Suprême du Bénin</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Accueil</a></li>
+                    <li><a href="login-agent.html">Espace Agent</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" style="padding: 30px 0;">
+        <div class="container">
+            <h2>Rendez-vous confirmé</h2>
+            <p>Votre demande a bien été enregistrée.</p>
+        </div>
+    </section>
+
+    <section class="structures">
+        <div class="container">
+            <div class="confirmation-box" id="confirmation-box">
+                <div class="icon">✅</div>
+                <h3>Demande envoyée avec succès !</h3>
+                <p>Votre demande de rendez-vous a été transmise à la structure concernée.</p>
+                <div class="details" id="rdv-details">
+                    <!-- Rempli par JavaScript -->
+                </div>
+                <a href="index.html" class="btn-accueil">Retour à l'accueil</a>
+                <a href="#" class="annulation-link" id="annulation-link">Annuler ce rendez-vous</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Cour Suprême du Bénin - Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rdvData = localStorage.getItem('lastRdv');
+            
+            if (!rdvData) {
+                document.getElementById('confirmation-box').innerHTML = `
+                    <div class="icon">⚠️</div>
+                    <h3>Aucune information de rendez-vous</h3>
+                    <p>Vous n'avez pas de rendez-vous en cours.</p>
+                    <a href="index.html" class="btn-accueil">Retour à l'accueil</a>
+                `;
+                return;
+            }
+
+            const rdv = JSON.parse(rdvData);
+            const details = document.getElementById('rdv-details');
+            
+            details.innerHTML = `
+                <p><strong>Structure :</strong> ${rdv.structure.nom_structure}</p>
+                <p><strong>Agent :</strong> ${rdv.creneau.agent.prenom} ${rdv.creneau.agent.nom}</p>
+                <p><strong>Jour :</strong> ${rdv.creneau.jour_semaine}</p>
+                <p><strong>Heure :</strong> ${rdv.creneau.heure_debut} - ${rdv.creneau.heure_fin}</p>
+                <p><strong>Nom :</strong> ${rdv.nom_complet}</p>
+                <p><strong>Email :</strong> ${rdv.email_citoyen}</p>
+                <p><strong>Motif :</strong> ${rdv.motif}</p>
+                <p><strong>Statut :</strong> En attente de confirmation</p>
+                <p><strong>Numéro de dossier :</strong> #${rdv.id_rdv}</p>
+            `;
+
+            // Gestion de l'annulation
+            document.getElementById('annulation-link').addEventListener('click', async function(e) {
+                e.preventDefault();
+                if (confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')) {
+                    try {
+                        await fetchAPI(`/rendez-vous/annuler/${rdv.token_annulation}`);
+                        alert('Votre rendez-vous a été annulé avec succès.');
+                        localStorage.removeItem('lastRdv');
+                        window.location.href = 'index.html';
+                    } catch (error) {
+                        alert('Erreur lors de l\'annulation : ' + error.message);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Agent - Cour Suprême</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-header {
+            background: linear-gradient(135deg, #0a1a3a, #1a3a6a);
+            color: #fff;
+            padding: 20px 0;
+        }
+        .dashboard-header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .dashboard-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .dashboard-header .user-info .avatar {
+            width: 45px;
+            height: 45px;
+            background: #f5c842;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #0a1a3a;
+            font-size: 1.2rem;
+        }
+        .dashboard-header .user-info .name {
+            font-weight: 600;
+        }
+        .dashboard-header .user-info .role {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        .btn-logout {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .dashboard-tabs {
+            display: flex;
+            gap: 10px;
+            margin: 30px 0 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .dashboard-tabs button {
+            background: none;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .dashboard-tabs button.active {
+            color: #0a1a3a;
+            background: #f0f2f5;
+        }
+        .dashboard-tabs button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #f5c842;
+        }
+        .dashboard-tabs button:hover {
+            background: #f0f2f5;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .card h4 {
+            color: #0a1a3a;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .creneau-item, .rdv-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .creneau-item:last-child, .rdv-item:last-child {
+            border-bottom: none;
+        }
+        .creneau-item .info, .rdv-item .info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .creneau-item .info .day {
+            font-weight: 700;
+            color: #0a1a3a;
+            min-width: 80px;
+        }
+        .creneau-item .info .hour {
+            color: #555;
+        }
+        .rdv-item .info .name {
+            font-weight: 600;
+            color: #0a1a3a;
+        }
+        .rdv-item .info .email {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .rdv-item .info .motif {
+            color: #888;
+            font-size: 0.9rem;
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rdv-item .status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-en-attente {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-accepte {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-refuse {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status-annule {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .btn-sm {
+            padding: 5px 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-sm:hover {
+            opacity: 0.8;
+        }
+        .btn-accept {
+            background: #28a745;
+            color: #fff;
+        }
+        .btn-refuse {
+            background: #dc3545;
+            color: #fff;
+        }
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: #fff;
+        }
+        .btn-add {
+            background: #28a745;
+            color: #fff;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-add:hover {
+            opacity: 0.8;
+        }
+
+        .empty-msg {
+            text-align: center;
+            padding: 30px;
+            color: #888;
+        }
+
+        /* Modale */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .modal h3 {
+            color: #0a1a3a;
+            margin-bottom: 20px;
+        }
+        .modal .form-group {
+            margin-bottom: 15px;
+        }
+        .modal .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .modal .form-group input,
+        .modal .form-group select,
+        .modal .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .modal .form-group input:focus,
+        .modal .form-group select:focus {
+            border-color: #1a3a6a;
+            outline: none;
+        }
+        .modal .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        .modal .btn-group button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .modal .btn-group button:hover {
+            opacity: 0.8;
+        }
+        .modal .btn-group .btn-save {
+            background: #0a1a3a;
+            color: #fff;
+        }
+        .modal .btn-group .btn-cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .rdv-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header .container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .creneau-item, .rdv-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .creneau-item .info, .rdv-item .info {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 5px;
+            }
+            .rdv-item .info .motif {
+                max-width: 100%;
+                white-space: normal;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Cour Suprême du Bénin</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Accueil</a></li>
+                    <li><a href="login-agent.html">Espace Agent</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="user-info">
+                <div class="avatar" id="avatar">J</div>
+                <div>
+                    <div class="name" id="agent-name">Agent</div>
+                    <div class="role" id="agent-structure">Structure</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="deconnexionDirecte()">🚪 Déconnexion</button>
+        </div>
+    </div>
+
+    <section style="padding: 20px 0 60px;">
+        <div class="container">
+            <!-- Tabs -->
+            <div class="dashboard-tabs">
+                <button class="active" data-tab="tab-creneaux">📅 Mes créneaux</button>
+                <button data-tab="tab-rdv">📩 Rendez-vous reçus</button>
+            </div>
+
+            <!-- Tab : Créneaux -->
+            <!-- Tab : Créneaux -->
+<div class="tab-content active" id="tab-creneaux">
+    <div class="card">
+        <h4>Mes créneaux disponibles</h4>
+        <div id="creneaux-list">
+            <p class="empty-msg">Chargement des créneaux...</p>
+        </div>
+    </div>
+</div>
+            <!-- Tab : Rendez-vous reçus -->
+            <div class="tab-content" id="tab-rdv">
+                <div class="card">
+                    <h4>Demandes de rendez-vous</h4>
+                    <div id="rdv-list">
+                        <p class="empty-msg">Chargement des rendez-vous...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal Ajout/Modification Créneau -->
+    <div class="modal-overlay" id="modal-creneau">
+        <div class="modal">
+            <h3 id="modal-creneau-title">Ajouter un créneau</h3>
+            <form id="creneau-form">
+                <input type="hidden" id="creneau-id" value="">
+                <div class="form-group">
+                    <label for="creneau-jour">Jour de la semaine</label>
+                    <select id="creneau-jour" required>
+                        <option value="Lundi">Lundi</option>
+                        <option value="Mardi">Mardi</option>
+                        <option value="Mercredi">Mercredi</option>
+                        <option value="Jeudi">Jeudi</option>
+                        <option value="Vendredi">Vendredi</option>
+                        <option value="Samedi">Samedi</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="creneau-debut">Heure de début</label>
+                    <input type="time" id="creneau-debut" required>
+                </div>
+                <div class="form-group">
+                    <label for="creneau-fin">Heure de fin</label>
+                    <input type="time" id="creneau-fin" required>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn-cancel" id="modal-creneau-cancel">Annuler</button>
+                    <button type="submit" class="btn-save" id="modal-creneau-save">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Refus RDV -->
+    <div class="modal-overlay" id="modal-refus">
+        <div class="modal">
+            <h3>Refuser le rendez-vous</h3>
+            <form id="refus-form">
+                <input type="hidden" id="refus-rdv-id" value="">
+                <div class="form-group">
+                    <label for="refus-motif">Motif du refus *</label>
+                    <textarea id="refus-motif" required placeholder="Expliquez pourquoi ce rendez-vous est refusé..." style="min-height:100px;"></textarea>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn-cancel" id="modal-refus-cancel">Annuler</button>
+                    <button type="submit" class="btn-save" style="background:#dc3545;color:#fff;">Confirmer le refus</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Cour Suprême du Bénin - Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/agent.js"></script>
+    
+</body>
+</html>

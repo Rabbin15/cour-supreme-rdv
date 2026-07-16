@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Agent - Cour Suprême</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .login-container {
+            max-width: 450px;
+            margin: 60px auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.12);
+        }
+        .login-container .logo-mini {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-container .logo-mini h2 {
+            color: #0a1a3a;
+            font-size: 1.5rem;
+        }
+        .login-container .logo-mini p {
+            color: #888;
+            font-size: 0.95rem;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus {
+            border-color: #1a3a6a;
+            outline: none;
+        }
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, #0a1a3a, #1a3a6a);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .btn-login:hover {
+            opacity: 0.9;
+        }
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .error-msg {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #1a3a6a;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Cour Suprême du Bénin</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Accueil</a></li>
+                    <li><a href="login-agent.html" class="active">Espace Agent</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" style="padding: 30px 0;">
+        <div class="container">
+            <h2>Espace Agent</h2>
+            <p>Connectez-vous pour gérer vos créneaux et rendez-vous.</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="login-container">
+                <div class="logo-mini">
+                    <h2>🔐 Connexion</h2>
+                    <p>Accédez à votre espace de travail</p>
+                </div>
+
+                <div id="error-msg" class="error-msg"></div>
+
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="ex: jean.kouassi@coursupreme.bj" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Mot de passe</label>
+                        <input type="password" id="password" placeholder="Votre mot de passe" required>
+                    </div>
+                    <button type="submit" class="btn-login" id="login-btn">Se connecter</button>
+                </form>
+
+                <a href="index.html" class="back-link">← Retour à l'accueil</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Cour Suprême du Bénin - Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const errorMsg = document.getElementById('error-msg');
+        const loginBtn = document.getElementById('login-btn');
+
+        // Si l'agent est déjà connecté, rediriger vers le dashboard
+        if (localStorage.getItem('token')) {
+            window.location.href = 'dashboard-agent.html';
+        }
+
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            // Réinitialiser l'erreur
+            errorMsg.style.display = 'none';
+            errorMsg.textContent = '';
+
+            // Validation simple
+            if (!email || !password) {
+                showError('Veuillez remplir tous les champs.');
+                return;
+            }
+
+            // Désactiver le bouton
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Connexion en cours...';
+
+            try {
+                const data = await fetchAPI('/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (data.status === 'success') {
+                    // Stocker le token et les infos de l'agent
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('agent', JSON.stringify(data.data.agent));
+                    
+                    // Rediriger vers le dashboard
+                    window.location.href = 'dashboard-agent.html';
+                } else {
+                    showError(data.message || 'Erreur de connexion');
+                }
+            } catch (error) {
+                showError('Erreur de connexion au serveur. Vérifiez votre réseau.');
+                console.error(error);
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Se connecter';
+            }
+        });
+
+        function showError(message) {
+            errorMsg.textContent = message;
+            errorMsg.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

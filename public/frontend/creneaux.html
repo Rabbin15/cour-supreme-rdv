@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créneaux disponibles - Cour Suprême</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .creneaux-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        }
+        .jour-block {
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 20px;
+        }
+        .jour-block:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .jour-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        .jour-header:hover {
+            background: #e9ecef;
+        }
+        .jour-header h3 {
+            margin: 0;
+            color: #0a1a3a;
+            font-size: 1.2rem;
+        }
+        .jour-header .badge {
+            background: #f5c842;
+            color: #0a1a3a;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .heures-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+            padding: 0 10px;
+        }
+        .heure-item {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #333;
+        }
+        .heure-item:hover {
+            border-color: #1a3a6a;
+            background: #eef2f7;
+            transform: translateY(-2px);
+        }
+        .heure-item.pris {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .heure-item.pris:hover {
+            transform: none;
+            background: #f8d7da;
+        }
+        .heure-item .time {
+            font-weight: 700;
+            color: #0a1a3a;
+        }
+        .heure-item .status-rdv {
+            font-size: 0.75rem;
+            color: #dc3545;
+            display: block;
+            margin-top: 3px;
+        }
+        .back-link {
+            display: inline-block;
+            margin: 20px 0;
+            color: #1a3a6a;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .empty-msg {
+            text-align: center;
+            padding: 30px;
+            color: #888;
+        }
+        .structure-name {
+            text-align: center;
+            color: #0a1a3a;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        .structure-sub {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Cour Suprême du Bénin</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Accueil</a></li>
+                    <li><a href="login-agent.html">Espace Agent</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" style="padding: 30px 0;">
+        <div class="container">
+            <h2 id="structure-name">Chargement...</h2>
+            <p id="structure-sub">Sélectionnez un créneau disponible pour prendre votre rendez-vous.</p>
+        </div>
+    </section>
+
+    <section class="structures" style="padding: 30px 0;">
+        <div class="container">
+            <a href="index.html" class="back-link">← Retour à l'accueil</a>
+            <div class="creneaux-container" id="creneaux-container">
+                <div id="creneaux-list">
+                    <p class="empty-msg">Chargement des créneaux...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Cour Suprême du Bénin - Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Récupérer l'ID de la structure depuis l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const structureId = urlParams.get('id');
+
+        // Ordre des jours pour l'affichage
+        const joursOrdre = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+
+        if (structureId) {
+            chargerCreneaux(structureId);
+        } else {
+            document.getElementById('creneaux-list').innerHTML = 
+                '<p class="empty-msg">Structure non spécifiée. <a href="index.html">Retour à l\'accueil</a></p>';
+        }
+
+        async function chargerCreneaux(id) {
+            try {
+                // Récupérer les infos de la structure
+                const structData = await fetchAPI(`/structures/${id}`);
+                document.getElementById('structure-name').textContent = structData.data.nom_structure;
+                document.getElementById('structure-sub').textContent = 'Sélectionnez un créneau disponible pour prendre votre rendez-vous.';
+
+                // Récupérer les créneaux
+                const data = await fetchAPI(`/structures/${id}/creneaux`);
+                const creneaux = data.data || [];
+                const list = document.getElementById('creneaux-list');
+
+                if (creneaux.length === 0) {
+                    list.innerHTML = '<p class="empty-msg">Aucun créneau disponible pour cette structure.</p>';
+                    return;
+                }
+
+                // Regrouper les créneaux par jour
+                const creneauxParJour = {};
+                joursOrdre.forEach(jour => { creneauxParJour[jour] = []; });
+
+                creneaux.forEach(c => {
+                    if (creneauxParJour[c.jour_semaine]) {
+                        creneauxParJour[c.jour_semaine].push(c);
+                    }
+                });
+
+                // Filtrer les jours vides
+                const joursAvecCreneaux = Object.keys(creneauxParJour).filter(jour => creneauxParJour[jour].length > 0);
+
+                if (joursAvecCreneaux.length === 0) {
+                    list.innerHTML = '<p class="empty-msg">Aucun créneau disponible pour cette structure.</p>';
+                    return;
+                }
+
+                // Construire l'affichage
+                list.innerHTML = joursAvecCreneaux.map(jour => `
+                    <div class="jour-block">
+                        <div class="jour-header">
+                            <h3>📅 ${jour}</h3>
+                            <span class="badge">${creneauxParJour[jour].length} créneaux</span>
+                        </div>
+                        <div class="heures-list">
+                            ${creneauxParJour[jour].map(c => {
+                                // Vérifier si le créneau est déjà pris
+                                const dejaPris = c.rendez_vous && c.rendez_vous.some(r => r.statut === 'accepte' || r.statut === 'en_attente');
+                                return `
+                                    <div class="heure-item ${dejaPris ? 'pris' : ''}" 
+                                         onclick="${dejaPris ? '' : `prendreRendezVous(${c.id_creneau})`}"
+                                         style="${dejaPris ? 'cursor:not-allowed;' : ''}">
+                                        <span class="time">${c.heure_debut} - ${c.heure_fin}</span>
+                                        ${dejaPris ? '<span class="status-rdv">❌ Déjà pris</span>' : '<span style="font-size:0.75rem;color:#28a745;">✅ Disponible</span>'}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                document.getElementById('creneaux-list').innerHTML = 
+                    `<p class="empty-msg">Erreur de chargement : ${error.message}</p>`;
+            }
+        }
+
+        function prendreRendezVous(id_creneau) {
+            window.location.href = `formulaire.html?creneau=${id_creneau}`;
+        }
+    </script>
+</body>
+</html>

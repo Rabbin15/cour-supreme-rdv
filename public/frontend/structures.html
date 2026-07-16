@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nos structures - Cour Suprême du Bénin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, #1a3a6a, #2a5a9a);
+            color: #fff;
+            padding: 40px 0;
+            text-align: center;
+        }
+        .page-header h2 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        .page-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        .structures-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 40px 0;
+        }
+        .structure-card-large {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border-left: 5px solid #f5c842;
+        }
+        .structure-card-large:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        .structure-card-large h4 {
+            font-size: 1.3rem;
+            color: #0a1a3a;
+            margin-bottom: 10px;
+        }
+        .structure-card-large p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .structure-card-large .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .structure-card-large .badge {
+            display: inline-block;
+            background: #f5c842;
+            color: #0a1a3a;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .structure-card-large .badge-rdv {
+            background: #1a3a6a;
+            color: #fff;
+        }
+        .back-link {
+            display: inline-block;
+            margin: 20px 0;
+            color: #1a3a6a;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            .structures-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Cour Suprême du Bénin</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Accueil</a></li>
+                    <li><a href="structures.html" class="active">Structures</a></li>
+                    <li><a href="login-agent.html">Espace Agent</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h2>🏛️ Nos structures</h2>
+            <p>Sélectionnez une structure pour prendre un rendez-vous ou consulter ses disponibilités.</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <a href="index.html" class="back-link">← Retour à l'accueil</a>
+            <div class="structures-grid" id="structures-grid">
+                <p>Chargement des structures...</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Cour Suprême du Bénin - Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            chargerStructures();
+        });
+
+        async function chargerStructures() {
+            try {
+                const data = await fetchAPI('/structures');
+                const structures = data.data;
+                const grid = document.getElementById('structures-grid');
+
+                if (grid) {
+                    grid.innerHTML = structures.map(structure => `
+                        <div class="structure-card-large" onclick="voirCreneaux(${structure.id_structure})">
+                            <h4>${structure.nom_structure}</h4>
+                            <p>${structure.description || 'Structure de la Cour Suprême du Bénin'}</p>
+                            <div class="meta">
+                                <span class="badge">🏛️ Structure</span>
+                                <span class="badge badge-rdv">Prendre RDV →</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                document.getElementById('structures-grid').innerHTML = 
+                    '<p class="empty-msg">Erreur de chargement. Veuillez réessayer.</p>';
+            }
+        }
+
+        function voirCreneaux(id_structure) {
+            window.location.href = `creneaux.html?id=${id_structure}`;
+        }
+    </script>
+</body>
+</html>

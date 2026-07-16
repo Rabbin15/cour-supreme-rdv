@@ -1,0 +1,179 @@
+/* ============================================
+   RESET & BASE
+============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ============================================
+   HEADER
+============================================ */
+header {
+    background: linear-gradient(135deg, #0a1a3a, #1a3a6a);
+    color: #fff;
+    padding: 20px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-img {
+    width: 60px;
+    height: auto;
+}
+
+.logo h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #f5c842;
+}
+
+/* ============================================
+   HERO
+============================================ */
+.hero {
+    background: linear-gradient(135deg, #1a3a6a, #2a5a9a);
+    color: #fff;
+    padding: 60px 0;
+    text-align: center;
+}
+
+.hero h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* ============================================
+   STRUCTURES
+============================================ */
+.structures {
+    padding: 60px 0;
+}
+
+.structures h3 {
+    text-align: center;
+    font-size: 2rem;
+    color: #0a1a3a;
+    margin-bottom: 40px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.structure-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    border-left: 5px solid #f5c842;
+}
+
+.structure-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.structure-card h4 {
+    font-size: 1.3rem;
+    color: #0a1a3a;
+    margin-bottom: 10px;
+}
+
+.structure-card p {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.structure-card .badge {
+    display: inline-block;
+    background: #f5c842;
+    color: #0a1a3a;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 15px;
+}
+
+/* ============================================
+   FOOTER
+============================================ */
+footer {
+    background: #0a1a3a;
+    color: #fff;
+    padding: 30px 0;
+    text-align: center;
+    margin-top: 60px;
+}
+
+/* ============================================
+   RESPONSIVE
+============================================ */
+@media (max-width: 768px) {
+    header .container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .hero h2 {
+        font-size: 1.8rem;
+    }
+    
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

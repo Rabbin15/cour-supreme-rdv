@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cour Suprême du Bénin - Prise de Rendez-vous</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="assets/logo-cour-supreme.png" alt="Logo Cour Suprême" class="logo-img">
+                <h1>Cour Suprême du Bénin</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Accueil</a></li>
+                    <li><a href="login-agent.html">Espace Agent</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h2>Gestion des rendez-vous administratifs</h2>
+            <p>Sélectionnez la structure avec laquelle vous souhaitez prendre un rendez-vous.</p>
+        </div>
+        <a href="structures.html" style="display:inline-block;margin-top:20px;color:#fff;text-decoration:underline;">
+    Voir toutes nos structures →
+</a>
+    </section>
+
+    <section class="structures" id="structures-list">
+        <div class="container">
+            <h3>Nos structures</h3>
+            <div class="grid" id="structures-grid">
+                <!-- Les structures seront chargées dynamiquement en JavaScript -->
+                <p>Chargement des structures...</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Cour Suprême du Bénin - Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/citoyen.js"></script>
+</body>
+</html>
