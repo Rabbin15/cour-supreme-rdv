@@ -1,6 +1,29 @@
 services:
   - type: web
     name: cour-supreme-rdv
-    runtime: php
-    buildCommand: composer install --optimize-autoloader --no-dev && php artisan config:cache && php artisan route:cache && php artisan view:cache
+    runtime: image
+    buildCommand: bash .render-build.sh
     startCommand: php artisan serve --host=0.0.0.0 --port=10000
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        value: https://cour-supreme-rdv.onrender.com
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        value: dpg-d9eve2rrj1hs73d78si
+      - key: DB_PORT
+        value: 5432
+      - key: DB_DATABASE
+        value: cour_supreme_db
+      - key: DB_USERNAME
+        value: cour_supreme_db_user
+      - key: DB_PASSWORD
+        value: ghEVjPY6UoZZhIeZkF7Ypj3GZVSaRTba
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_DRIVER
+        value: file
